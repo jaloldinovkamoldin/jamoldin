@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kamoldin academy – Aqlni Charxlovchi O‘yinlar Platformasi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- YUQORI NAVIGATSIYA PANELI -->
+  <header class="topbar">
+    <div class="brand" onclick="goHome()">
+      <span class="brand-logo">🧠</span>
+      <div>
+        <h1 class="brand-title">kamoldin academy</h1>
+        <small id="t-subtitle">Aqlni charxlovchi o‘yinlar platformasi</small>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <!-- Tilni almashtirish (barcha sahifalarda ko‘rinadi) -->
+      <div class="lang-switcher" role="group" aria-label="Language">
+        <button class="lang-btn active" data-lang="uz" onclick="setLanguage('uz')">🇺🇿 UZ</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">🇷🇺 RU</button>
+        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+      </div>
+
+      <!-- Ovozni yoqish/o‘chirish -->
+      <button id="sound-toggle" class="icon-btn" onclick="toggleSound()" title="Ovoz">🔊</button>
+
+      <!-- Profil va statistika tugmalari (ro‘yxatdan o‘tgandan keyin ko‘rinadi) -->
+      <div id="nav-user-controls" class="nav-user-controls hidden">
+        <button class="nav-pill" onclick="showScreen('dashboard-screen')" id="t-nav-games">🎮 O‘yinlar</button>
+        <button class="nav-pill" onclick="showScreen('stats-screen')" id="t-nav-stats">📊 Natijalar</button>
+        <button class="nav-pill profile-pill" onclick="openProfileModal()">
+          👤 <span id="header-user-name">Foydalanuvchi</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1. RO‘YXATDAN O‘TISH EKRANI -->
+    <section id="register-screen" class="screen active">
+      <div class="card auth-card">
+        <div class="auth-header">
+          <div class="hero-badge">🚀 3 – 24 YOSH UCHUN</div>
+          <h2 id="t-reg-title">SMART BRAIN platformasiga xush kelibsiz!</h2>
+          <p id="t-reg-desc">Shaxsiy profilingizni yarating va yoshingizga mos 30 ta aqliy o‘yinlarni boshlang.</p>
+        </div>
+
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="firstName" id="t-lbl-fname">Ismingiz *</label>
+              <input type="text" id="firstName" required placeholder="Masalan: Ali" />
+            </div>
+            <div class="form-group">
+              <label for="lastName" id="t-lbl-lname">Familiyangiz *</label>
+              <input type="text" id="lastName" required placeholder="Masalan: Valiyev" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="userAge" id="t-lbl-age">Yoshingiz (3–24) *</label>
+              <input type="number" id="userAge" min="3" max="24" required placeholder="12" />
+            </div>
+            <div class="form-group">
+              <label for="userLangSelect" id="t-lbl-lang">Tilni tanlang *</label>
+              <select id="userLangSelect" onchange="setLanguage(this.value)">
+                <option value="uz">🇺🇿 O‘zbek tili</option>
+                <option value="ru">🇷🇺 Русский язык</option>
+                <option value="en">🇬🇧 English</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="t-btn-start">
+            Boshlash 🚀
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. ASOSIY DASHBOARD (YOSH GURUHI VA 30 TA O‘YIN) -->
+    <section id="dashboard-screen" class="screen">
+      <!-- Foydalanuvchi banneri va kunlik topshiriq -->
+      <div class="dashboard-hero" id="dashboard-hero">
+        <div class="hero-info">
+          <span class="age-group-badge" id="group-badge">2-guruh: 9–13 yosh</span>
+          <h2 id="welcome-user-title">Salom, Ali!</h2>
+          <p id="group-description">Mantiq, matematika, xotira va tezkor fikrlash o‘yinlari sizni kutmoqda.</p>
+        </div>
+
+        <div class="hero-stats-mini">
+          <div class="mini-stat">
+            <span class="mini-label" id="t-stat-score">Umumiy ball</span>
+            <strong id="dash-total-score">0</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-label" id="t-stat-iq">Aqliy indeks (IQ)</span>
+            <strong id="dash-iq-score">100</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-label" id="t-stat-level">Joriy daraja</span>
+            <strong id="dash-difficulty">Easy</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kunlik topshiriq va yosh guruhini almashtirish -->
+      <div class="toolbar-row">
+        <div class="daily-quest-box">
+          <span>🎯 <strong id="t-daily-title">Kunlik topshiriq:</strong></span>
+          <span id="daily-quest-text">Bugun kamida 3 ta o‘yinni yakunlang (0/3)</span>
+          <div class="progress-bar-sm">
+            <div id="daily-progress-fill" class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="group-tabs">
+          <button class="tab-btn" data-group="1" onclick="switchAgeGroup(1)" id="t-tab-g1">👶 3–6 yosh (10)</button>
+          <button class="tab-btn active" data-group="2" onclick="switchAgeGroup(2)" id="t-tab-g2">🧒 9–13 yosh (10)</button>
+          <button class="tab-btn" data-group="3" onclick="switchAgeGroup(3)" id="t-tab-g3">🎓 14–24 yosh (10)</button>
+        </div>
+      </div>
+
+      <!-- 10 ta o‘yin kartochkalari ro‘yxati -->
+      <div id="games-grid" class="games-grid"></div>
+    </section>
+
+    <!-- 3. O‘YIN JARAYONI EKRANI -->
+    <section id="game-screen" class="screen">
+      <div class="game-header-bar">
+        <button class="btn btn-secondary" onclick="confirmExitGame()" id="t-btn-back">⬅ Orqaga qaytish</button>
+
+        <div class="game-meta">
+          <h3 id="active-game-title">O‘yin nomi</h3>
+          <span class="badge-diff" id="active-game-diff">Easy</span>
+        </div>
+
+        <div class="game-controls">
+          <span class="timer-pill">⏱ <strong id="game-timer">00:00</strong></span>
+          <span class="score-pill">⭐ <strong id="game-live-score">0</strong></span>
+          <button class="btn btn-warning" onclick="togglePauseGame()" id="btn-pause">⏸ To‘xtatish</button>
+        </div>
+      </div>
+
+      <!-- Savol progressi -->
+      <div class="question-progress-wrap">
+        <div class="progress-text">
+          <span id="question-counter">Savol 1 / 8</span>
+          <span id="streak-indicator">🔥 Seriya: 0</span>
+        </div>
+        <div class="progress-bar">
+          <div id="question-progress-fill" class="progress-fill" style="width: 12.5%"></div>
+        </div>
+      </div>
+
+      <!-- O‘yin maydoni -->
+      <div class="card game-arena" id="game-arena">
+        <div id="question-visual" class="question-visual"></div>
+        <h2 id="question-text" class="question-text">Savol matni bu yerda chiqadi</h2>
+
+        <!-- Variantli javoblar uchun -->
+        <div id="options-container" class="options-grid"></div>
+
+        <!-- Yozma javoblar uchun (matematika/shifr) -->
+        <div id="input-answer-box" class="input-answer-box hidden">
+          <input type="text" id="text-answer-input" placeholder="Javobingizni kiriting..." autocomplete="off" />
+          <button class="btn btn-primary" onclick="submitTextAnswer()" id="t-btn-check">Javobni tekshirish</button>
+        </div>
+
+        <!-- Xotira o‘yinlari uchun maxsus tugma -->
+        <div id="memory-action-box" class="hidden" style="margin-top: 14px;">
+          <button class="btn btn-primary" onclick="startMemoryRecall()" id="t-btn-ready">Tayyorman, savolni ko‘rsat</button>
+        </div>
+
+        <!-- Natija xabari (yashil / qizil) -->
+        <div id="feedback-banner" class="feedback-banner hidden"></div>
+
+        <!-- Keyingi savol tugmasi -->
+        <div class="next-btn-wrap">
+          <button id="btn-next-question" class="btn btn-primary btn-lg hidden" onclick="nextQuestion()">
+            Keyingi savol ➡
+          </button>
+        </div>
+      </div>
+
+      <!-- Pauza oynasi -->
+      <div id="pause-overlay" class="pause-overlay hidden">
+        <div class="card pause-card">
+          <h2>⏸ <span id="t-paused-title">O‘yin to‘xtatildi</span></h2>
+          <p id="t-paused-desc">Tayyor bo‘lganingizda o‘yinni davom ettirishingiz mumkin.</p>
+          <div class="pause-actions">
+            <button class="btn btn-primary btn-lg" onclick="togglePauseGame()" id="t-btn-resume">▶ Davom ettirish</button>
+            <button class="btn btn-secondary" onclick="exitToDashboard()" id="t-btn-exit-menu">🏠 O‘yinlar menyusi</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. O‘YIN YAKUNI NATIJALARI EKRANI -->
+    <section id="result-screen" class="screen">
+      <div class="card result-card">
+        <div class="result-trophy" id="result-trophy">🏆</div>
+        <h2 id="t-res-title">O‘yin yakunlandi!</h2>
+        <p id="result-game-subtitle" class="subtitle-muted"></p>
+
+        <div class="result-stats-grid">
+          <div class="res-box res-correct">
+            <span id="t-res-correct">To‘g‘ri javoblar</span>
+            <strong id="res-correct-val">0</strong>
+          </div>
+          <div class="res-box res-wrong">
+            <span id="t-res-wrong">Noto‘g‘ri javoblar</span>
+            <strong id="res-wrong-val">0</strong>
+          </div>
+          <div class="res-box res-score">
+            <span id="t-res-points">To‘plangan ball</span>
+            <strong id="res-points-val">0</strong>
+          </div>
+          <div class="res-box res-time">
+            <span id="t-res-time">Sarflangan vaqt</span>
+            <strong id="res-time-val">00:00</strong>
+          </div>
+          <div class="res-box res-percent">
+            <span id="t-res-accuracy">Foiz natija</span>
+            <strong id="res-accuracy-val">0%</strong>
+          </div>
+          <div class="res-box res-iq">
+            <span id="t-res-iq">IQ / Mantiq bahosi</span>
+            <strong id="res-iq-val">105</strong>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn btn-primary btn-lg" onclick="replayCurrentGame()" id="t-btn-replay">🔄 Qayta o‘ynash</button>
+          <button class="btn btn-secondary btn-lg" onclick="showScreen('dashboard-screen')" id="t-btn-all-games">🎮 Barcha o‘yinlar</button>
+          <button class="btn btn-outline btn-lg" onclick="showScreen('stats-screen')" id="t-btn-view-stats">📊 Statistika va Reyting</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SHAXSIY STATISTIKA, TARIX, YUTUQLAR VA REYTING EKRANI -->
+    <section id="stats-screen" class="screen">
+      <div class="stats-top-bar">
+        <button class="btn btn-secondary" onclick="showScreen('dashboard-screen')" id="t-btn-back-dash">⬅ O‘yinlarga qaytish</button>
+        <h2 id="t-stats-heading">Shaxsiy statistika va reyting</h2>
+        <button class="btn btn-primary" onclick="openProfileModal()" id="t-btn-edit-prof">✏️ Profilni tahrirlash</button>
+      </div>
+
+      <!-- Umumiy ko‘rsatkichlar -->
+      <div class="summary-cards">
+        <div class="card sum-card">
+          <span id="t-sum-games">O‘ynalgan o‘yinlar</span>
+          <strong id="stat-games-played">0</strong>
+        </div>
+        <div class="card sum-card">
+          <span id="t-sum-points">Jami ball</span>
+          <strong id="stat-total-points">0</strong>
+        </div>
+        <div class="card sum-card">
+          <span id="t-sum-accuracy">O‘rtacha aniqlik</span>
+          <strong id="stat-avg-accuracy">0%</strong>
+        </div>
+        <div class="card sum-card">
+          <span id="t-sum-iq">IQ Indeksi</span>
+          <strong id="stat-current-iq">100</strong>
+        </div>
+      </div>
+
+      <div class="stats-two-col">
+        <!-- Yutuqlar va medallar -->
+        <div class="card">
+          <h3 id="t-medals-title">🏅 Yutuqlar va medallar</h3>
+          <div id="achievements-list" class="achievements-grid"></div>
+        </div>
+
+        <!-- Reyting jadvali -->
+        <div class="card">
+          <h3 id="t-leaderboard-title">🏆 Ballar bo‘yicha reyting</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th id="t-th-player">Ishtirokchi</th>
+                <th id="t-th-age">Yosh</th>
+                <th id="t-th-pts">Ball</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- O‘yinlar tarixi -->
+      <div class="card" style="margin-top: 20px;">
+        <h3 id="t-history-title">📜 O‘yinlar tarixi</h3>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th id="t-th-game">O‘yin</th>
+                <th id="t-th-diff">Daraja</th>
+                <th id="t-th-res">Natija</th>
+                <th id="t-th-score">Ball</th>
+                <th id="t-th-time">Vaqt</th>
+                <th id="t-th-date">Sana</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PROFILNI TAHRIRLASH MODALI -->
+  <div id="profile-modal" class="modal-backdrop hidden">
+    <div class="card modal-card">
+      <div class="modal-header">
+        <h3 id="t-modal-prof-title">✏️ Profilni tahrirlash</h3>
+        <button class="icon-btn" onclick="closeProfileModal()">✖</button>
+      </div>
+      <form onsubmit="saveProfileEdit(event)">
+        <div class="form-group">
+          <label id="t-edit-fname">Ism</label>
+          <input type="text" id="editFirstName" required />
+        </div>
+        <div class="form-group">
+          <label id="t-edit-lname">Familiya</label>
+          <input type="text" id="editLastName" required />
+        </div>
+        <div class="form-group">
+          <label id="t-edit-age">Yosh (3–24)</label>
+          <input type="number" id="editAge" min="3" max="24" required />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" id="t-btn-save">Saqlash</button>
+          <button type="button" class="btn btn-secondary" onclick="closeProfileModal()" id="t-btn-cancel">Bekor qilish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
